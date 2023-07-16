@@ -65,18 +65,25 @@
     }
 
     function drawLine(nums: number[]) {
-        const size = canvas.height;
+        const size = canvas.clientHeight;
+        canvas.setAttribute("width", size.toString());
+        canvas.setAttribute("height", size.toString());
+        const buttonSize = size*0.27;   //buttons are 27% height/width
         const ctx = canvas.getContext("2d");
         if (ctx !== null) {
             ctx.beginPath();
+            ctx.strokeStyle = "red";
             /*
             * size/2 = middle
             * size/2 - size/4 = left or top
             * size/2 + size/4 = right or bottom
             */
-            ctx.moveTo(size/2 + size/4 * (nums[0]%3 - 1), size/2 + size/4 * (Math.floor(nums[0]/3) - 1)); //first point
-            ctx.lineTo(size/2 + size/4 * (nums[2]%3 - 1), size/2 + size/4 * (Math.floor(nums[2]/3) - 1)); //second point
-            ctx.stroke(); //draw
+            const firstPoint = [size/2 + size/4 * (nums[0]%3 - 1), size/2 + size/4 * (Math.floor(nums[0]/3) - 1)];
+            const secondPoint = [size/2 + size/4 * (nums[2]%3 - 1), size/2 + size/4 * (Math.floor(nums[2]/3) - 1)];
+            ctx.moveTo(firstPoint[0], firstPoint[1]);
+            ctx.lineTo(secondPoint[0], secondPoint[1]);
+            console.log(`Size: ${size}\nPoint 1: (${firstPoint[0]}, ${firstPoint[1]})\nPoint 2: (${secondPoint[0]}, ${secondPoint[1]})`);
+            ctx.stroke(); //draw the line
         }
     }
 </script>
@@ -126,8 +133,7 @@
         color: aliceblue;
         height: 27%;
         width: 27%;
-        margin-top: auto;
-        margin-bottom: auto;
+        margin: 1%;
         border: none;
         font-size: xx-large;
     }
