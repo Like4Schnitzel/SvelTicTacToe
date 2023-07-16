@@ -1,32 +1,26 @@
 <script lang="ts">
-    import { to_number } from "svelte/internal";
-
-    class Pattern {
-        fieldNums: number[];
-        rotate: number;
-
-        constructor(numbers: number[], rotationDegrees: number) {
-            this.fieldNums = numbers;
-            this.rotate = rotationDegrees;
-        }
-    }
-
-    const patterns: Pattern[] = [
-    new Pattern([0, 1, 2], 0), new Pattern([3, 4, 5], 0), new Pattern([6, 7, 8], 0),       //horizontal
-    new Pattern([0, 3, 6], 90), new Pattern([1, 4, 7], 90), new Pattern([2, 5, 8], 90),    //vertical
-    new Pattern([0, 4, 8], 45), new Pattern([2, 4, 6], 135)                                //diagonal
+    const patterns: number[][] = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
     ];
 
     const fields: string[] = [];
     for (let i = 1; i <= 9; i++) {
         fields.push(i.toString());
     }
-    let correctPatterns: Pattern[] = [];
+    let correctPatterns: number[][] = [];
 
     let player: string = 'X';
     let winner: string;
     let headerText: string;
     $: headerText = `Current player: ${player}`
+    let canvas: HTMLCanvasElement;
 
     function updateBoard(index: number) {
         if (winner === undefined && fields[index] <= '9')  { //'O' and 'X' have a higher ASCII value than '0' to '9'
@@ -36,6 +30,10 @@
             if (correctPatterns.length > 0) {
                 winner = player;
                 headerText = `The winner is ${winner}!`
+
+                for (const pattern of correctPatterns) {
+                    drawLine(pattern);
+                }
             }
             else {
                 if (player === 'X') {
@@ -50,47 +48,61 @@
     function calculateWinner(index: number) {
         let goodPattern: boolean;
 
-        patterns.forEach(pattern => {
+        for (const pattern of patterns) {
             goodPattern = true;
-            pattern.fieldNums.forEach(num => {
+            for (const num of pattern) {
                 if (fields[num] !== player) {
                     goodPattern = false;
-                    return; //breaks out of the forEach()
+                    break;
                 }
-            });
+            }
 
             if (goodPattern) {
                 correctPatterns.push(pattern);
                 correctPatterns = correctPatterns;
             }
-        });
+        }
+    }
+
+    function drawLine(nums: number[]) {
+        const size = canvas.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx !== null) {
+            ctx.beginPath();
+            /*
+            * size/2 = middle
+            * size/2 - size/4 = left or top
+            * size/2 + size/4 = right or bottom
+            */
+            ctx.moveTo(size/2 + size/4 * (nums[0]%3 - 1), size/2 + size/4 * (Math.floor(nums[0]/3) - 1)); //first point
+            ctx.lineTo(size/2 + size/4 * (nums[2]%3 - 1), size/2 + size/4 * (Math.floor(nums[2]/3) - 1)); //second point
+            ctx.stroke(); //draw
+        }
     }
 </script>
 
-<body id="main">
+<body class="main">
     <h1>{headerText}</h1>
-    <div id="board">
-        {#each correctPatterns as pattern}
-            <div class="correctLine" style="top: {50+38.5*((Math.round(pattern.fieldNums[1]/3)-1))}%; transform: rotate({pattern.rotate}deg);"></div>
-        {/each}
+    <div class="board">
+        <canvas class="lines" bind:this={canvas}></canvas>
         {#each fields as num}
-            <button on:click={ () => updateBoard(to_number(num)-1) }>{num}</button>
+            <button on:click={ () => updateBoard(parseInt(num)-1) }>{num}</button>
         {/each}
     </div>
 </body>
 
 <style>
-    #main {
+    .main {
         background-color: rgb(47, 44, 48);
     }
 
-    #main h1 {
+    .main h1 {
         font-family: Arial, Helvetica, sans-serif;
         color: aliceblue;
         text-align: center;
     }
 
-    #board {
+    .board {
         width: 50vh;
         height: 50vh;
         background-color: rgb(75, 72, 72);
@@ -100,6 +112,13 @@
         flex-wrap: wrap;
         justify-content: space-evenly;
         position: relative;
+    }
+
+    .lines {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        pointer-events: none;
     }
 
     button {
@@ -119,13 +138,5 @@
 
     button:active {
         background-color: rgb(158, 152, 152);
-    }
-
-    .correctLine {
-        width: 80%;
-        height: 10%;
-        margin: auto;
-        background-color: rgb(221, 6, 6);
-        position: absolute;
     }
 </style>
