@@ -136,9 +136,10 @@
         background-color: rgb(75, 72, 72);
         margin: auto;
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
         justify-content: space-evenly;
+        flex-wrap: wrap;
+        gap: 2rem;
+        padding: 2rem;
         position: relative;
     }
 
@@ -152,8 +153,8 @@
     .field {
         background-color: rgb(110, 106, 106);
         color: aliceblue;
-        height: 27%;
         width: 27%;
+        height: 27%;
         border: none;
         font-size: xx-large;
     }
