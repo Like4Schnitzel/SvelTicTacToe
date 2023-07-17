@@ -154,7 +154,6 @@
         color: aliceblue;
         height: 27%;
         width: 27%;
-        margin: auto;
         border: none;
         font-size: xx-large;
     }
