@@ -16,24 +16,17 @@
     }
     let correctPatterns: number[][] = [];
 
-    let player: string = 'X';
-    let winner: string;
-    let headerText: string;
-    $: headerText = `Current player: ${player}`
+    let player: 'X'|'O' = 'X';
+    let winner: string|undefined;
     let canvas: HTMLCanvasElement;
 
     function updateBoard(index: number) {
         if (winner === undefined && fields[index] <= '9')  { //'O' and 'X' have a higher ASCII value than '0' to '9'
             fields[index] = player;
 
-            calculateWinner(index);
+            calculateWinner();
             if (correctPatterns.length > 0) {
                 winner = player;
-                headerText = `The winner is ${winner}!`
-
-                for (const pattern of correctPatterns) {
-                    drawLine(pattern);
-                }
             }
             else {
                 if (player === 'X') {
@@ -45,7 +38,7 @@
         }
     }
 
-    function calculateWinner(index: number) {
+    function calculateWinner() {
         let goodPattern: boolean;
 
         for (const pattern of patterns) {
@@ -58,8 +51,8 @@
             }
 
             if (goodPattern) {
+                drawLine(pattern);
                 correctPatterns.push(pattern);
-                correctPatterns = correctPatterns;
             }
         }
     }
@@ -73,6 +66,7 @@
         if (ctx !== null) {
             ctx.beginPath();
             ctx.strokeStyle = "red";
+            ctx.lineWidth = 7;
             /*
             * size/2 = middle
             * size/2 - size/4 = left or top
@@ -86,15 +80,37 @@
             ctx.stroke(); //draw the line
         }
     }
+
+    function reset() {
+        correctPatterns = [];
+        player = 'X';
+        winner = undefined;
+        for (let i = 0; i < 9; i++) {
+            fields[i] = (i+1).toString();
+        }
+
+        //clear lines
+        const ctx = canvas.getContext("2d");
+        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
 </script>
 
 <body class="main">
-    <h1>{headerText}</h1>
-    <div class="board">
-        <canvas class="lines" bind:this={canvas}></canvas>
-        {#each fields as num}
-            <button on:click={ () => updateBoard(parseInt(num)-1) }>{num}</button>
-        {/each}
+    <div class="column">
+        <h1>
+            {#if winner}
+                The winner is {winner}!
+            {:else}
+                Current player: {player}
+            {/if}
+        </h1>
+        <div class="board">
+            <canvas class="lines" bind:this={canvas}></canvas>
+            {#each fields as num}
+                <button class="field" on:click={ () => updateBoard(parseInt(num)-1) }>{num}</button>
+            {/each}
+        </div>
+        <button class="reset" on:click={ () => reset() }>Reset</button>
     </div>
 </body>
 
@@ -103,10 +119,15 @@
         background-color: rgb(47, 44, 48);
     }
 
-    .main h1 {
+    h1 {
         font-family: Arial, Helvetica, sans-serif;
         color: aliceblue;
         text-align: center;
+    }
+
+    .column {
+        display: flex;
+        flex-direction: column;
     }
 
     .board {
@@ -128,21 +149,29 @@
         pointer-events: none;
     }
 
-    button {
+    .field {
         background-color: rgb(110, 106, 106);
         color: aliceblue;
         height: 27%;
         width: 27%;
-        margin: 1%;
+        margin: auto;
         border: none;
         font-size: xx-large;
     }
 
-    button:hover {
+    .field:hover {
         background-color: rgb(134, 129, 129);
     }
 
-    button:active {
+    .field:active {
         background-color: rgb(158, 152, 152);
+    }
+
+    .reset {
+        width: 10vh;
+        height: 3vh;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
     }
 </style>
