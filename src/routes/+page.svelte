@@ -59,8 +59,8 @@
 
     function drawLine(nums: number[]) {
         const size = canvas.clientHeight;
-        canvas.setAttribute("width", size.toString());
-        canvas.setAttribute("height", size.toString());
+        canvas.setAttribute("width", size.toString() + 'px');
+        canvas.setAttribute("height", size.toString() + 'px');
         const buttonSize = size*0.27;   //buttons are 27% height/width
         const ctx = canvas.getContext("2d");
         if (ctx !== null) {
@@ -135,9 +135,9 @@
         height: 50vh;
         background-color: rgb(75, 72, 72);
         margin: auto;
-        display: flex;
-        justify-content: space-evenly;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
         gap: 2rem;
         padding: 2rem;
         position: relative;
@@ -153,8 +153,6 @@
     .field {
         background-color: rgb(110, 106, 106);
         color: aliceblue;
-        width: 27%;
-        height: 27%;
         border: none;
         font-size: xx-large;
     }
