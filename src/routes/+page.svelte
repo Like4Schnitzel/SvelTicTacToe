@@ -61,7 +61,10 @@
         const size = canvas.clientHeight;
         canvas.setAttribute("width", size.toString() + 'px');
         canvas.setAttribute("height", size.toString() + 'px');
-        const buttonSize = size*0.27;   //buttons are 27% height/width
+        const buttonSize = document.querySelector(".field")?.clientHeight;
+        if (!buttonSize) return;
+        const halfButtonSize = buttonSize / 2;
+        //console.log(`Half button size is ${halfButtonSize}`);
         const ctx = canvas.getContext("2d");
         if (ctx !== null) {
             ctx.beginPath();
@@ -69,14 +72,19 @@
             ctx.lineWidth = 7;
             /*
             * size/2 = middle
-            * size/2 - size/4 = left or top
-            * size/2 + size/4 = right or bottom
+            * offset multiplied with either -1, 0 or 1
             */
-            const firstPoint = [size/2 + size/4 * (nums[0]%3 - 1), size/2 + size/4 * (Math.floor(nums[0]/3) - 1)];
-            const secondPoint = [size/2 + size/4 * (nums[2]%3 - 1), size/2 + size/4 * (Math.floor(nums[2]/3) - 1)];
+            const firstPoint = [
+                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (nums[0]%3 - 1),
+                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (Math.floor(nums[0]/3) - 1)
+            ];
+            const secondPoint = [
+                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (nums[2]%3 - 1),
+                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (Math.floor(nums[2]/3) - 1)
+            ];
             ctx.moveTo(firstPoint[0], firstPoint[1]);
             ctx.lineTo(secondPoint[0], secondPoint[1]);
-            console.log(`Size: ${size}\nPoint 1: (${firstPoint[0]}, ${firstPoint[1]})\nPoint 2: (${secondPoint[0]}, ${secondPoint[1]})`);
+            //console.log(`Size: ${size}\nPoint 1: (${firstPoint[0]}, ${firstPoint[1]})\nPoint 2: (${secondPoint[0]}, ${secondPoint[1]})`);
             ctx.stroke(); //draw the line
         }
     }
