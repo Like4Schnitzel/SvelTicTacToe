@@ -23,6 +23,7 @@
     let canvas: HTMLCanvasElement;
     let ctx: CanvasRenderingContext2D;
     let size: number;
+    let populated = 0;
 
     onMount( () => {
         const c = canvas.getContext("2d");
@@ -32,6 +33,7 @@
     function updateBoard(index: number) {
         if (winner === undefined && fields[index] <= '9')  { //'O' and 'X' have a higher ASCII value than '0' to '9'
             fields[index] = player;
+            populated++;
 
             calculateWinner();
             if (correctPatterns.length > 0) {
@@ -102,6 +104,7 @@
     }
 
     function reset() {
+        populated = 0;
         correctPatterns = [];
         player = 'X';
         winner = undefined;
@@ -121,7 +124,11 @@
             {#if winner}
                 The winner is {winner}!
             {:else}
-                Current player: {player}
+                {#if populated === 9}
+                    Draw!
+                {:else}
+                    Current player: {player}
+                {/if}
             {/if}
         </h1>
         <div class="board">
