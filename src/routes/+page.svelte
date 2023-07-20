@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
     const patterns: number[][] = [
         [0, 1, 2],
         [3, 4, 5],
@@ -17,8 +19,18 @@
     let correctPatterns: number[][] = [];
 
     let player: 'X'|'O' = 'X';
-    let winner: string|undefined;
+    let winner: 'X'|'O'|undefined;
     let canvas: HTMLCanvasElement;
+    let ctx: CanvasRenderingContext2D;
+    let size: number;
+
+    onMount( () => {
+        const c = canvas.getContext("2d");
+        if (c) ctx = c;
+        size = canvas.clientHeight;
+        canvas.setAttribute("width", size.toString() + 'px');
+        canvas.setAttribute("height", size.toString() + 'px');
+    });
 
     function updateBoard(index: number) {
         if (winner === undefined && fields[index] <= '9')  { //'O' and 'X' have a higher ASCII value than '0' to '9'
@@ -51,6 +63,8 @@
             }
 
             if (goodPattern) {
+                console.log("Drawing pattern: ")
+                console.log(pattern);
                 drawLine(pattern);
                 correctPatterns.push(pattern);
             }
@@ -58,35 +72,32 @@
     }
 
     function drawLine(nums: number[]) {
-        const size = canvas.clientHeight;
-        canvas.setAttribute("width", size.toString() + 'px');
-        canvas.setAttribute("height", size.toString() + 'px');
+        if (!ctx) return;
         const buttonSize = document.querySelector(".field")?.clientHeight;
         if (!buttonSize) return;
         const halfButtonSize = buttonSize / 2;
         //console.log(`Half button size is ${halfButtonSize}`);
-        const ctx = canvas.getContext("2d");
-        if (ctx !== null) {
-            ctx.beginPath();
-            ctx.strokeStyle = "red";
-            ctx.lineWidth = 7;
-            /*
-            * size/2 = middle
-            * offset multiplied with either -1, 0 or 1
-            */
-            const firstPoint = [
-                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (nums[0]%3 - 1),
-                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (Math.floor(nums[0]/3) - 1)
-            ];
-            const secondPoint = [
-                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (nums[2]%3 - 1),
-                size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (Math.floor(nums[2]/3) - 1)
-            ];
-            ctx.moveTo(firstPoint[0], firstPoint[1]);
-            ctx.lineTo(secondPoint[0], secondPoint[1]);
-            //console.log(`Size: ${size}\nPoint 1: (${firstPoint[0]}, ${firstPoint[1]})\nPoint 2: (${secondPoint[0]}, ${secondPoint[1]})`);
-            ctx.stroke(); //draw the line
-        }
+        ctx.beginPath();
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 7;
+        /*
+        * size/2 = middle
+        * offset goes to the edge of the button with "+ halfButtonSize"
+        * then adds half of the distance from the edge of the button to the edge of the board
+        * offset multiplied with either -1, 0 or 1
+        */
+        const firstPoint = [
+            size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (nums[0]%3 - 1),
+            size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (Math.floor(nums[0]/3) - 1)
+        ];
+        const secondPoint = [
+            size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (nums[2]%3 - 1),
+            size/2 + (halfButtonSize + (size/2 - halfButtonSize)/2) * (Math.floor(nums[2]/3) - 1)
+        ];
+        ctx.moveTo(firstPoint[0], firstPoint[1]);
+        ctx.lineTo(secondPoint[0], secondPoint[1]);
+        //console.log(`Size: ${size}\nPoint 1: (${firstPoint[0]}, ${firstPoint[1]})\nPoint 2: (${secondPoint[0]}, ${secondPoint[1]})`);
+        ctx.stroke(); //draw the line
     }
 
     function reset() {
