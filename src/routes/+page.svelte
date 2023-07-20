@@ -27,9 +27,6 @@
     onMount( () => {
         const c = canvas.getContext("2d");
         if (c) ctx = c;
-        size = canvas.clientHeight;
-        canvas.setAttribute("width", size.toString() + 'px');
-        canvas.setAttribute("height", size.toString() + 'px');
     });
 
     function updateBoard(index: number) {
@@ -63,8 +60,12 @@
             }
 
             if (goodPattern) {
-                console.log("Drawing pattern: ")
-                console.log(pattern);
+                if (!size)
+                {
+                    size = canvas.clientHeight;
+                    canvas.setAttribute("width", size.toString() + 'px');
+                    canvas.setAttribute("height", size.toString() + 'px');
+                }
                 drawLine(pattern);
                 correctPatterns.push(pattern);
             }
